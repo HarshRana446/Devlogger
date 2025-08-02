@@ -2,6 +2,7 @@ lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
+<<<<<<< HEAD
   excludeLinksFromLockfile: false
 
 importers:
@@ -6657,3 +6658,6 @@ snapshots:
   zod@3.24.1: {}
 
   zwitch@2.0.4: {}
+=======
+  excludeLinksFromLockfile: false
+>>>>>>> f2dfc32 (Initial commit)
