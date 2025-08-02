@@ -178,7 +178,7 @@ export default function LogsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <LogCard log={log} onDelete={fetchLogs} />
+                    <LogCard log={log} index={index} onDelete={fetchLogs} />
                   </motion.div>
                 ))}
               </motion.div>
