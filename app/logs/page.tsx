@@ -127,120 +127,122 @@ export default function LogsPage() {
       <Navbar />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-4 md:p-6 ml-0 md:ml-64 pt-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-7xl mx-auto"
-          >
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-              <div className="flex items-center gap-3">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring" }}
-                  className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"
-                >
-                  <BookOpen className="w-6 h-6 text-white" />
-                </motion.div>
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">Development Logs</h1>
-                  <p className="text-gray-400 text-sm md:text-base">
-                    {filteredLogs.length} {filteredLogs.length === 1 ? "log" : "logs"} found
-                  </p>
-                </div>
-              </div>
-
-              <Link href="/new">
-                <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 w-full md:w-auto">
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Log
-                </Button>
-              </Link>
-            </div>
-
-            {/* Filters */}
+        <main className="flex-1 ml-0 md:ml-64" style={{ paddingTop: "80px" }}>
+          <div className="p-4 md:p-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="glass rounded-xl p-4 md:p-6 mb-8"
+              transition={{ duration: 0.5 }}
+              className="max-w-7xl mx-auto"
             >
-              <div className="flex flex-col lg:flex-row gap-4">
-                {/* Search */}
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="Search logs..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-black/50 border-gray-700 focus:border-blue-500"
-                  />
+              {/* Header */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: "spring" }}
+                    className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"
+                  >
+                    <BookOpen className="w-6 h-6 text-white" />
+                  </motion.div>
+                  <div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-white">Development Logs</h1>
+                    <p className="text-gray-400 text-sm md:text-base">
+                      {filteredLogs.length} {filteredLogs.length === 1 ? "log" : "logs"} found
+                    </p>
+                  </div>
                 </div>
 
-                {/* Tag Filter */}
-                <div className="lg:w-80">
-                  <TagFilter availableTags={allTags} selectedTags={selectedTags} onTagsChange={setSelectedTags} />
-                </div>
+                <Link href="/new">
+                  <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 w-full md:w-auto">
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Log
+                  </Button>
+                </Link>
               </div>
-            </motion.div>
 
-            {/* Logs Grid */}
-            {filteredLogs.length === 0 ? (
+              {/* Filters */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-center py-16"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="glass rounded-xl p-4 md:p-6 mb-8"
               >
+                <div className="flex flex-col lg:flex-row gap-4">
+                  {/* Search */}
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      placeholder="Search logs..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 bg-black/50 border-gray-700 focus:border-blue-500"
+                    />
+                  </div>
+
+                  {/* Tag Filter */}
+                  <div className="lg:w-80">
+                    <TagFilter availableTags={allTags} selectedTags={selectedTags} onTagsChange={setSelectedTags} />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Logs Grid */}
+              {filteredLogs.length === 0 ? (
                 <motion.div
-                  animate={{
-                    rotate: [0, 10, -10, 0],
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    repeatType: "reverse",
-                  }}
-                  className="inline-block mb-6"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-center py-16"
                 >
-                  <Sparkles className="w-16 h-16 text-gray-600" />
+                  <motion.div
+                    animate={{
+                      rotate: [0, 10, -10, 0],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Number.POSITIVE_INFINITY,
+                      repeatType: "reverse",
+                    }}
+                    className="inline-block mb-6"
+                  >
+                    <Sparkles className="w-16 h-16 text-gray-600" />
+                  </motion.div>
+                  <h3 className="text-xl font-semibold text-gray-300 mb-4">
+                    {searchTerm || selectedTags.length > 0 ? "No logs match your filters" : "No logs yet"}
+                  </h3>
+                  <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                    {searchTerm || selectedTags.length > 0
+                      ? "Try adjusting your search terms or selected tags to find what you're looking for."
+                      : "Start documenting your development journey by creating your first log entry."}
+                  </p>
+                  {!searchTerm && selectedTags.length === 0 && (
+                    <Link href="/new">
+                      <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Your First Log
+                      </Button>
+                    </Link>
+                  )}
                 </motion.div>
-                <h3 className="text-xl font-semibold text-gray-300 mb-4">
-                  {searchTerm || selectedTags.length > 0 ? "No logs match your filters" : "No logs yet"}
-                </h3>
-                <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                  {searchTerm || selectedTags.length > 0
-                    ? "Try adjusting your search terms or selected tags to find what you're looking for."
-                    : "Start documenting your development journey by creating your first log entry."}
-                </p>
-                {!searchTerm && selectedTags.length === 0 && (
-                  <Link href="/new">
-                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Your First Log
-                    </Button>
-                  </Link>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              >
-                <AnimatePresence>
-                  {filteredLogs.map((log, index) => (
-                    <LogCard key={log._id} log={log} onDelete={handleDeleteLog} index={index} />
-                  ))}
-                </AnimatePresence>
-              </motion.div>
-            )}
-          </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  <AnimatePresence>
+                    {filteredLogs.map((log, index) => (
+                      <LogCard key={log._id} log={log} onDelete={handleDeleteLog} index={index} />
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
         </main>
       </div>
     </div>
