@@ -1,17 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
 import { Save, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { MarkdownEditor } from "@/components/markdown-editor"
-import { TagSelector } from "@/components/tag-selector"
 import { Navbar } from "@/components/navbar"
 import { Sidebar } from "@/components/sidebar"
+import { MarkdownEditor } from "@/components/markdown-editor"
+import { TagSelector } from "@/components/tag-selector"
 import { AnimatedButton } from "@/components/animated-button"
 import { useToast } from "@/hooks/use-toast"
+import Link from "next/link"
 
 export default function NewLogPage() {
   const router = useRouter()
@@ -22,10 +23,19 @@ export default function NewLogPage() {
   const [saving, setSaving] = useState(false)
 
   const handleSave = async () => {
-    if (!title.trim() || !content.trim()) {
+    if (!title.trim()) {
       toast({
-        title: "Missing Information",
-        description: "Please provide both title and content for your log.",
+        title: "Title Required",
+        description: "Please enter a title for your log.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!content.trim()) {
+      toast({
+        title: "Content Required",
+        description: "Please enter some content for your log.",
         variant: "destructive",
       })
       return
@@ -39,13 +49,17 @@ export default function NewLogPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ title, content, tags }),
+        body: JSON.stringify({
+          title: title.trim(),
+          content: content.trim(),
+          tags,
+        }),
       })
 
       if (response.ok) {
         toast({
           title: "Log Saved",
-          description: "Your log has been saved successfully!",
+          description: "Your development log has been saved successfully.",
         })
         router.push("/logs")
       } else {
@@ -53,8 +67,8 @@ export default function NewLogPage() {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to save log. Please try again.",
+        title: "Save Failed",
+        description: "Failed to save your log. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -70,46 +84,50 @@ export default function NewLogPage() {
         <Sidebar />
 
         <main className="flex-1 ml-0 md:ml-64 pt-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
               {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-                <div className="flex items-center gap-4 mb-4 sm:mb-0">
-                  <Link href="/logs">
-                    <AnimatedButton variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                      <ArrowLeft className="w-4 h-4 mr-2" />
-                      Back to Logs
-                    </AnimatedButton>
-                  </Link>
-                  <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                      New Log Entry
-                    </h1>
-                    <p className="text-gray-400 mt-2">Document your development journey</p>
-                  </div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    Create New Log
+                  </h1>
+                  <p className="text-gray-400 mt-2 text-sm md:text-base">Document your development journey</p>
                 </div>
-
-                <AnimatedButton onClick={handleSave} disabled={saving} variant="gradient" glowEffect size="md">
-                  <Save className="w-4 h-4 mr-2" />
-                  {saving ? "Saving..." : "Save Log"}
-                </AnimatedButton>
+                <div className="flex gap-3">
+                  <Link href="/logs">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-gray-700 hover:border-gray-600 bg-transparent"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Back
+                    </Button>
+                  </Link>
+                  <AnimatedButton onClick={handleSave} disabled={saving} variant="gradient" glowEffect size="sm">
+                    <Save className="w-4 h-4 mr-2" />
+                    {saving ? "Saving..." : "Save Log"}
+                  </AnimatedButton>
+                </div>
               </div>
 
-              {/* Form */}
               <div className="space-y-6">
-                {/* Title */}
+                {/* Title Input */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.1 }}
-                  className="glass rounded-xl p-6"
+                  transition={{ delay: 0.1 }}
+                  className="glass rounded-xl p-4 md:p-6"
                 >
-                  <label className="block text-sm font-medium text-gray-300 mb-3">Title</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Title <span className="text-red-400">*</span>
+                  </label>
                   <Input
-                    placeholder="What did you work on today?"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="text-lg bg-black/50 border-gray-700 focus:border-blue-500 transition-colors"
+                    placeholder="Enter a descriptive title for your log..."
+                    className="bg-black/50 border-gray-700 focus:border-blue-500 text-white placeholder-gray-500 text-sm md:text-base"
                   />
                 </motion.div>
 
@@ -117,27 +135,41 @@ export default function NewLogPage() {
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.2 }}
-                  className="glass rounded-xl p-6 tag-selector-container"
+                  transition={{ delay: 0.2 }}
+                  className="glass rounded-xl p-4 md:p-6"
                 >
                   <label className="block text-sm font-medium text-gray-300 mb-3">Tags</label>
-                  <TagSelector
-                    selectedTags={tags}
-                    onTagsChange={setTags}
-                    placeholder="Add tags (React, API, MongoDB, etc.)"
-                  />
+                  <TagSelector selectedTags={tags} onTagsChange={setTags} />
                 </motion.div>
 
-                {/* Content */}
+                {/* Content Editor */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.3 }}
-                  className="glass rounded-xl p-6 markdown-editor-container"
+                  transition={{ delay: 0.3 }}
+                  className="glass rounded-xl p-4 md:p-6"
                 >
-                  <label className="block text-sm font-medium text-gray-300 mb-3">Content</label>
-                  <MarkdownEditor value={content} onChange={setContent} placeholder="Write your log in markdown..." />
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Content <span className="text-red-400">*</span>
+                  </label>
+                  <div className="markdown-editor-container">
+                    <MarkdownEditor value={content} onChange={setContent} />
+                  </div>
                 </motion.div>
+
+                {/* Save Button - Mobile */}
+                <div className="block sm:hidden">
+                  <AnimatedButton
+                    onClick={handleSave}
+                    disabled={saving}
+                    variant="gradient"
+                    glowEffect
+                    className="w-full"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {saving ? "Saving..." : "Save Log"}
+                  </AnimatedButton>
+                </div>
               </div>
             </motion.div>
           </div>

@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { BookOpen, Plus, Download, Home, Menu, X } from "lucide-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useState } from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
+import { easeOut, motion } from "framer-motion";
+import { BookOpen, Download, Home, Menu, Plus, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const sidebarItems = [
   { href: "/logs", icon: Home, label: "Dashboard" },
   { href: "/new", icon: Plus, label: "New Log" },
   { href: "/export", icon: Download, label: "Export" },
-]
+];
 
 export function Sidebar() {
-  const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   const sidebarVariants = {
     open: { x: 0, opacity: 1 },
     closed: { x: -280, opacity: 0 },
-  }
+  };
 
   const itemVariants = {
     open: (i: number) => ({
@@ -29,14 +29,14 @@ export function Sidebar() {
       transition: {
         delay: i * 0.1,
         duration: 0.3,
-        ease: "easeOut",
+        ease: easeOut, // Use the imported easing function
       },
     }),
     closed: {
       opacity: 0,
       x: -20,
     },
-  }
+  };
 
   return (
     <>
@@ -61,31 +61,38 @@ export function Sidebar() {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - FIXED POSITIONING */}
       <motion.aside
         className={cn(
-          "fixed left-0 top-16 h-[calc(100vh-4rem)] w-70 bg-gray-950/95 backdrop-blur-xl border-r border-gray-800/50 z-50",
-          "md:relative md:translate-x-0 md:opacity-100 md:w-64",
+          "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-gray-950/95 backdrop-blur-xl border-r border-gray-800/50 z-50 overflow-y-auto",
+          "md:block",
+          isOpen ? "block" : "hidden md:block"
         )}
         variants={sidebarVariants}
         initial="closed"
-        animate={isOpen ? "open" : "open"}
+        animate="open"
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         <div className="p-6 space-y-2">
           {sidebarItems.map((item, index) => {
-            const isActive = pathname === item.href
-            const Icon = item.icon
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
 
             return (
-              <motion.div key={item.href} custom={index} variants={itemVariants} initial="closed" animate="open">
+              <motion.div
+                key={item.href}
+                custom={index}
+                variants={itemVariants}
+                initial="closed"
+                animate="open"
+              >
                 <Link href={item.href} onClick={() => setIsOpen(false)}>
                   <motion.div
                     className={cn(
                       "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden",
                       isActive
                         ? "bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-cyan-600/20 text-white border border-blue-500/30"
-                        : "text-gray-400 hover:text-white hover:bg-gray-800/50",
+                        : "text-gray-400 hover:text-white hover:bg-gray-800/50"
                     )}
                     whileHover={{ scale: 1.02, x: 4 }}
                     whileTap={{ scale: 0.98 }}
@@ -103,7 +110,7 @@ export function Sidebar() {
                         "p-2 rounded-lg transition-colors",
                         isActive
                           ? "bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 text-white"
-                          : "bg-gray-800 group-hover:bg-gray-700",
+                          : "bg-gray-800 group-hover:bg-gray-700"
                       )}
                       whileHover={{ rotate: 360 }}
                       transition={{ duration: 0.5 }}
@@ -111,7 +118,9 @@ export function Sidebar() {
                       <Icon className="w-4 h-4" />
                     </motion.div>
 
-                    <span className="font-medium relative z-10">{item.label}</span>
+                    <span className="font-medium relative z-10">
+                      {item.label}
+                    </span>
 
                     {isActive && (
                       <motion.div
@@ -130,7 +139,7 @@ export function Sidebar() {
                   </motion.div>
                 </Link>
               </motion.div>
-            )
+            );
           })}
         </div>
 
@@ -144,12 +153,16 @@ export function Sidebar() {
           <div className="p-4 rounded-xl bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-cyan-600/10 border border-gray-700/50">
             <div className="flex items-center space-x-2 mb-2">
               <BookOpen className="w-4 h-4 text-blue-400" />
-              <span className="text-sm font-medium text-gray-300">Quick Tip</span>
+              <span className="text-sm font-medium text-gray-300">
+                Quick Tip
+              </span>
             </div>
-            <p className="text-xs text-gray-400">Use markdown syntax to format your logs beautifully!</p>
+            <p className="text-xs text-gray-400">
+              Use markdown syntax to format your logs beautifully!
+            </p>
           </div>
         </motion.div>
       </motion.aside>
     </>
-  )
+  );
 }

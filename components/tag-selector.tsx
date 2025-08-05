@@ -1,167 +1,131 @@
 "use client"
 
-import { useState, type KeyboardEvent } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import type React from "react"
+
+import { useState, useRef, useEffect } from "react"
 import { X, Plus } from "lucide-react"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 interface TagSelectorProps {
   selectedTags: string[]
   onTagsChange: (tags: string[]) => void
+  availableTags?: string[]
   placeholder?: string
-  suggestions?: string[]
 }
-
-const commonTags = [
-  "React",
-  "JavaScript",
-  "TypeScript",
-  "Node.js",
-  "Python",
-  "API",
-  "Database",
-  "MongoDB",
-  "PostgreSQL",
-  "CSS",
-  "HTML",
-  "Git",
-  "Docker",
-  "AWS",
-  "Bug Fix",
-  "Feature",
-  "Learning",
-  "Tutorial",
-  "Project",
-  "Debug",
-]
 
 export function TagSelector({
   selectedTags,
   onTagsChange,
+  availableTags = [],
   placeholder = "Add tags...",
-  suggestions = commonTags,
 }: TagSelectorProps) {
   const [inputValue, setInputValue] = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const filteredSuggestions = suggestions.filter(
-    (tag) => tag.toLowerCase().includes(inputValue.toLowerCase()) && !selectedTags.includes(tag),
+  const filteredSuggestions = availableTags.filter(
+    (tag) =>
+      tag.toLowerCase().includes(inputValue.toLowerCase()) && !selectedTags.includes(tag) && inputValue.length > 0,
   )
 
   const addTag = (tag: string) => {
-    const trimmedTag = tag.trim()
-    if (trimmedTag && !selectedTags.includes(trimmedTag)) {
-      onTagsChange([...selectedTags, trimmedTag])
+    if (tag.trim() && !selectedTags.includes(tag.trim())) {
+      onTagsChange([...selectedTags, tag.trim()])
+      setInputValue("")
+      setShowSuggestions(false)
     }
-    setInputValue("")
-    setShowSuggestions(false)
   }
 
   const removeTag = (tagToRemove: string) => {
     onTagsChange(selectedTags.filter((tag) => tag !== tagToRemove))
   }
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && inputValue.trim()) {
       e.preventDefault()
       addTag(inputValue)
     } else if (e.key === "Backspace" && !inputValue && selectedTags.length > 0) {
       removeTag(selectedTags[selectedTags.length - 1])
+    } else if (e.key === "Escape") {
+      setShowSuggestions(false)
     }
   }
 
-  return (
-    <div className="space-y-3">
-      {/* Selected Tags */}
-      {selectedTags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          <AnimatePresence>
-            {selectedTags.map((tag) => (
-              <motion.div
-                key={tag}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Badge
-                  variant="secondary"
-                  className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-blue-300 border-blue-500/30 pr-1"
-                >
-                  {tag}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeTag(tag)}
-                    className="ml-1 h-4 w-4 p-0 hover:bg-red-500/20"
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </Badge>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
 
-      {/* Input */}
-      <div className="relative">
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  return (
+    <div className="relative">
+      <div className="flex flex-wrap gap-2 p-3 border border-gray-700 rounded-lg bg-gray-900/50 focus-within:border-blue-500 transition-colors">
+        {selectedTags.map((tag) => (
+          <Badge
+            key={tag}
+            variant="secondary"
+            className="bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
+          >
+            {tag}
+            <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-blue-200 transition-colors">
+              <X className="w-3 h-3" />
+            </button>
+          </Badge>
+        ))}
         <Input
+          ref={inputRef}
+          type="text"
           value={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value)
-            setShowSuggestions(true)
+            setShowSuggestions(e.target.value.length > 0)
           }}
           onKeyDown={handleKeyDown}
-          onFocus={() => setShowSuggestions(true)}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-          placeholder={placeholder}
-          className="bg-black/50 border-gray-700 focus:border-blue-500 transition-colors"
+          onFocus={() => setShowSuggestions(inputValue.length > 0)}
+          placeholder={selectedTags.length === 0 ? placeholder : ""}
+          className="flex-1 min-w-[120px] border-none bg-transparent p-0 focus:ring-0 focus:outline-none"
         />
-
-        {/* Suggestions */}
-        <AnimatePresence>
-          {showSuggestions && (inputValue || filteredSuggestions.length > 0) && (
-            <>
-              {/* Backdrop to close dropdown */}
-              <div className="fixed inset-0 z-40" onClick={() => setShowSuggestions(false)} />
-
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto"
-                style={{ zIndex: 9999 }}
-              >
-                {inputValue && !selectedTags.includes(inputValue.trim()) && (
-                  <button
-                    onMouseDown={(e) => e.preventDefault()} // Prevent blur on click
-                    onClick={() => addTag(inputValue)}
-                    className="w-full px-3 py-2 text-left hover:bg-gray-800 transition-colors flex items-center"
-                  >
-                    <Plus className="w-4 h-4 mr-2 text-green-400" />
-                    Add "{inputValue.trim()}"
-                  </button>
-                )}
-
-                {filteredSuggestions.map((tag) => (
-                  <button
-                    key={tag}
-                    onMouseDown={(e) => e.preventDefault()} // Prevent blur on click
-                    onClick={() => addTag(tag)}
-                    className="w-full px-3 py-2 text-left hover:bg-gray-800 transition-colors text-gray-300"
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+        {inputValue && (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={() => addTag(inputValue)}
+            className="h-6 px-2 text-xs"
+          >
+            <Plus className="w-3 h-3" />
+          </Button>
+        )}
       </div>
+
+      {/* Suggestions Dropdown with highest z-index */}
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <>
+          {/* Backdrop to ensure proper layering */}
+          <div className="fixed inset-0 z-[999998]" onClick={() => setShowSuggestions(false)} />
+
+          {/* Suggestions dropdown */}
+          <div className="absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-[999999] max-h-48 overflow-y-auto">
+            {filteredSuggestions.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => addTag(tag)}
+                className="w-full text-left px-3 py-2 hover:bg-gray-800 transition-colors text-gray-300 hover:text-white"
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }

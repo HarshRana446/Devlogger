@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Calendar, Tag, Edit, Trash2, Eye } from 'lucide-react'
+import { Calendar, Tag, Edit, Trash2, Eye } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { AnimatedButton } from "@/components/animated-button"
 import Link from "next/link"
@@ -20,66 +20,67 @@ interface LogCardProps {
 
 export function LogCard({ log, onDelete, index }: LogCardProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     })
   }
 
   const getPreview = (content: string) => {
-    return content.replace(/[#*`]/g, '').substring(0, 150) + (content.length > 150 ? '...' : '')
+    return content.replace(/[#*`]/g, "").substring(0, 150) + (content.length > 150 ? "..." : "")
+  }
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this log?")) return
+    onDelete(log._id)
   }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ 
-        duration: 0.5, 
+      transition={{
+        duration: 0.5,
         delay: index * 0.1,
-        ease: "easeOut"
+        ease: "easeOut",
       }}
-      whileHover={{ 
+      whileHover={{
         scale: 1.02,
         y: -5,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
       className="group relative"
     >
       {/* Glow effect on hover */}
-      <motion.div
-        className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 rounded-xl opacity-0 blur group-hover:opacity-20 transition-opacity duration-300"
-      />
-      
+      <motion.div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 rounded-xl opacity-0 blur group-hover:opacity-20 transition-opacity duration-300" />
+
       <div className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-xl p-6 hover:border-gray-700/50 transition-all duration-300">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
-          <motion.h3 
+          <motion.h3
             className="text-lg font-semibold text-white group-hover:text-blue-300 transition-colors duration-300 line-clamp-2"
             layoutId={`title-${log._id}`}
           >
             {log.title}
           </motion.h3>
-          
-          <motion.div
-            className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          >
+
+          <motion.div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Link href={`/logs/${log._id}`}>
-              <AnimatedButton size="sm" variant="ghost" className="h-8 w-8 p-0">
+              <AnimatedButton size="sm" variant="ghost" className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300">
                 <Eye className="w-4 h-4" />
               </AnimatedButton>
             </Link>
-            <Link href={`/logs/${log._id}?edit=true`}>
-              <AnimatedButton size="sm" variant="ghost" className="h-8 w-8 p-0">
+            <Link href={`/logs/${log._id}`}>
+              <AnimatedButton size="sm" variant="ghost" className="h-8 w-8 p-0 text-green-400 hover:text-green-300">
                 <Edit className="w-4 h-4" />
               </AnimatedButton>
             </Link>
-            <AnimatedButton 
-              size="sm" 
-              variant="ghost" 
+            <AnimatedButton
+              size="sm"
+              variant="ghost"
               className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
-              onClick={() => onDelete(log._id)}
+              onClick={handleDelete}
             >
               <Trash2 className="w-4 h-4" />
             </AnimatedButton>
@@ -87,7 +88,7 @@ export function LogCard({ log, onDelete, index }: LogCardProps) {
         </div>
 
         {/* Content Preview */}
-        <motion.p 
+        <motion.p
           className="text-gray-400 text-sm mb-4 line-clamp-3"
           initial={{ opacity: 0.8 }}
           whileHover={{ opacity: 1 }}
@@ -97,7 +98,7 @@ export function LogCard({ log, onDelete, index }: LogCardProps) {
 
         {/* Tags */}
         {log.tags.length > 0 && (
-          <motion.div 
+          <motion.div
             className="flex flex-wrap gap-2 mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -111,8 +112,8 @@ export function LogCard({ log, onDelete, index }: LogCardProps) {
                 transition={{ delay: 0.3 + tagIndex * 0.1 }}
                 whileHover={{ scale: 1.05 }}
               >
-                <Badge 
-                  variant="secondary" 
+                <Badge
+                  variant="secondary"
                   className="bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30 transition-colors"
                 >
                   <Tag className="w-3 h-3 mr-1" />
@@ -129,7 +130,7 @@ export function LogCard({ log, onDelete, index }: LogCardProps) {
         )}
 
         {/* Footer */}
-        <motion.div 
+        <motion.div
           className="flex items-center justify-between text-xs text-gray-500"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -139,12 +140,9 @@ export function LogCard({ log, onDelete, index }: LogCardProps) {
             <Calendar className="w-3 h-3" />
             <span>{formatDate(log.createdAt)}</span>
           </div>
-          
-          <motion.div
-            className="px-2 py-1 bg-gray-800/50 rounded-full text-xs"
-            whileHover={{ scale: 1.05 }}
-          >
-            {log.content.split(' ').length} words
+
+          <motion.div className="px-2 py-1 bg-gray-800/50 rounded-full text-xs" whileHover={{ scale: 1.05 }}>
+            {log.content.split(" ").length} words
           </motion.div>
         </motion.div>
 
